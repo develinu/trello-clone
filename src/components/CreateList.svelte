@@ -39,7 +39,7 @@
           e.key === "Enter" && addList()
           e.key === "Escape" && offEditMode()
           e.key === "Esc" && offEditMode()  // ms browser 대응
-        }}></textarea>
+        }} />
       <div class="actions">
         <div 
           class="btn success"
