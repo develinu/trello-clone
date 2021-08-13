@@ -1,10 +1,12 @@
 <script>
-  import { tick } from 'svelte'
+  import { onDestroy, tick, createEventDispatcher } from 'svelte'
   import { autoFocusout } from '~/actions/autoFocusout'
   import { cards } from '~/store/list'
 
   export let listId
   export let card
+
+  const dispatcher = createEventDispatcher()
 
   let isEditMode = false
   let title
@@ -29,13 +31,19 @@
   }
   async function onEditMode() {
     isEditMode = true
+    dispatcher("editMode", true)
     title = card.title
     await tick()
     textareaEl && textareaEl.focus()
   }
   function offEditMode() {
     isEditMode = false
+    dispatcher("editMode", false)
   }
+
+  onDestroy(() => {
+    offEditMode()
+  })
 </script>
 
 <div class="card">
@@ -48,7 +56,7 @@
         bind:this={textareaEl}
         placeholder="Enter a title for this card..."
         on:keydown={e => {
-          e.key === "Enter" && addCard()
+          e.key === "Enter" && saveCard()
           e.key === "Escape" && offEditMode()
           e.key === "Esc" && offEditMode()
         }}></textarea>
@@ -87,6 +95,23 @@
     margin: 0 0 8px 0;
     &:last-child {
       margin: 0 0 1px 0;
+    }
+    :global(&.sortable-ghost) {
+      position: relative;
+      opacity: .1;
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: black;
+        border-radius: 4px;
+      }      
+    }
+    :global(&.sortable-chosen) {
+      cursor: move;
     }
 
     .title {

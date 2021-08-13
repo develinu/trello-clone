@@ -80,5 +80,18 @@ export const cards = {
       _remove(foundList.cards, { id: cardId })
       return $lists
     })
+  },
+  reorder(payload) {
+    const { fromListId, toListId, oldIndex, newIndex } = payload
+    _lists.update($lists => {
+      const foundFromList = _find($lists, { id: fromListId })
+      const foundToList = fromListId === toListId 
+        ? foundFromList
+        :_find($lists, { id: toListId })
+      const clone = _cloneDeep(foundFromList.cards[oldIndex])
+      foundFromList.cards.splice(oldIndex, 1)
+      foundToList.cards.splice(newIndex, 0, clone)
+      return $lists
+    })    
   }
 }
